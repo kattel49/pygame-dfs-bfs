@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 WIDTH, HEIGHT = 900, 500
 BLACK = (0, 0, 0)
@@ -71,7 +72,7 @@ def bfs(origin, dest):
         visited_nodes.add(node)
         # get the neighboring nodes
         neighbour_of_node = find_neighbours(node)
-        print(neighbour_of_node, node)
+        # check validity of the nodes and append it to the queue
         for n in neighbour_of_node:
             if n in visited_nodes or n == -1:
                 continue
@@ -80,15 +81,24 @@ def bfs(origin, dest):
         WIN.fill(NEIGH, GRAPH_NODES[node])
         pygame.display.update()
 
-def dfs_helper(node):
-    pass
-
-def dfs(origin, dest):
-    pass
-
+Q = False
+def dfs(origin, dest, visited):
+    global Q
+    if origin == dest:
+        print("Destination Found")
+        Q = True
+    neighbors = [x for x in find_neighbours(origin) if x != -1 and x not in visited]
+    while len(neighbors) > 0:
+        if Q:
+            break
+        # pick a random neighbor
+        n = neighbors.pop(random.randint(0, len(neighbors)-1))
+        if n != dest:
+            WIN.fill(NEIGH, GRAPH_NODES[n])
+            visited.add(n)
+        dfs(n, dest, visited)
 
 def draw_grid(origin, dest):
-    print(origin, dest)
     count = 0
     for y in range(0, HEIGHT, BLOCK_SIZE):
         for x in range(0, WIDTH, BLOCK_SIZE):
@@ -101,7 +111,6 @@ def draw_grid(origin, dest):
             else:
                 pygame.draw.rect(WIN, RED, rect, 1)
             count += 1
-    print(count)
 
 def rand_start_end():
     origin = random.randint(0, GRAPH_HEIGHT*GRAPH_WIDTH - 1)
@@ -112,11 +121,11 @@ def rand_start_end():
 
 def main():
     run = True
-    #clock = pygame.time.Clock()
+    clock = pygame.time.Clock()
     origin, dest = rand_start_end()
     draw_grid(origin, dest)
     while run:
-        #clock.tick(FPS)
+        clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -125,14 +134,16 @@ def main():
         if keys_pressed[pygame.K_r]:
             WIN.fill(BLACK)
             origin, dest  = rand_start_end()
-            print(find_neighbours(0))
             draw_grid(origin, dest)
-        #test neighbors
-        if keys_pressed[pygame.K_t]:
-            WIN.fill((255,255,255), GRAPH_NODES[0])
-            bfs_test(0, dest)
         if keys_pressed[pygame.K_b]:
             bfs(origin, dest)
+        if keys_pressed[pygame.K_d]:
+            global Q
+            Q = False
+            print("Depth First Search in progress")
+            dfs(origin, dest, set([origin]))
+        if keys_pressed[pygame.K_q]:
+            break
         
         
         #make changes to the window and then update
