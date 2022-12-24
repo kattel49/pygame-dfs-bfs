@@ -1,13 +1,12 @@
 import pygame
 import random
-import time
 
 WIDTH, HEIGHT = 900, 500
 BLACK = (0, 0, 0)
 RED = (153, 0, 0)
 ORIGIN = (0, 102, 0)
 DEST = (153, 51, 153)
-NEIGH = (153, 102, 255)
+NEIGH = (0, 153, 204)
 FPS = 60
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Graph Visualization")
@@ -17,10 +16,6 @@ GRAPH_HEIGHT = HEIGHT//BLOCK_SIZE
 #adjency list
 GRAPH = [[] for x in range( GRAPH_WIDTH * GRAPH_HEIGHT)]
 GRAPH_NODES = []
-
-def draw_window():
-    WIN.fill(BLACK)
-    pygame.display.update()
 
 def make_graph():
     for x, i in enumerate(GRAPH):
@@ -96,6 +91,7 @@ def dfs(origin, dest, visited):
         if n != dest:
             WIN.fill(NEIGH, GRAPH_NODES[n])
             visited.add(n)
+        pygame.display.update()
         dfs(n, dest, visited)
 
 def draw_grid(origin, dest):
@@ -114,9 +110,7 @@ def draw_grid(origin, dest):
 
 def rand_start_end():
     origin = random.randint(0, GRAPH_HEIGHT*GRAPH_WIDTH - 1)
-
     dest = random.randint(0, GRAPH_HEIGHT*GRAPH_WIDTH - 1)
-
     return origin, dest
 
 def main():
@@ -124,6 +118,7 @@ def main():
     clock = pygame.time.Clock()
     origin, dest = rand_start_end()
     draw_grid(origin, dest)
+    pygame.display.update()
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -135,6 +130,7 @@ def main():
             WIN.fill(BLACK)
             origin, dest  = rand_start_end()
             draw_grid(origin, dest)
+            pygame.display.update()
         if keys_pressed[pygame.K_b]:
             bfs(origin, dest)
         if keys_pressed[pygame.K_d]:
@@ -143,12 +139,7 @@ def main():
             print("Depth First Search in progress")
             dfs(origin, dest, set([origin]))
         if keys_pressed[pygame.K_q]:
-            break
-        
-        
-        #make changes to the window and then update
-        pygame.display.update()
-    
+            run = False
     pygame.quit()
 
 
